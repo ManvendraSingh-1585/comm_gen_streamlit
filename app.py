@@ -1,11 +1,8 @@
 import streamlit as st
-import tensorflow as tf
-import pandas as pd
 import torch
 from transformers import T5Tokenizer, T5ForConditionalGeneration, Adafactor, AutoTokenizer,GPT2Tokenizer, GPT2LMHeadModel
 from sklearn.utils import shuffle
 import time
-from transformers import TextDataset,DataCollatorForLanguageModeling,pipeline
 from gtts import gTTS
 from IPython.display import Audio
 
