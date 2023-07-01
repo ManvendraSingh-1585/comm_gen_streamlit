@@ -2,7 +2,7 @@ import streamlit as st
 import tensorflow as tf
 import pandas as pd
 import torch
-from transformers import T5Tokenizer, T5ForConditionalGeneration, Adafactor, AutoTokenizer
+from transformers import T5Tokenizer, T5ForConditionalGeneration, Adafactor, AutoTokenizer,GPT2Tokenizer, GPT2LMHeadModel
 from sklearn.utils import shuffle
 import time
 from transformers import TextDataset,DataCollatorForLanguageModeling,pipeline
@@ -17,17 +17,19 @@ else:
    dev = torch.device("cpu")
    print("Running on the CPU")
 
+model_path_t5 = "https://drive.google.com/file/d/1--Ls6VzRSq7tOS5P2XSbvBFZxi8Zm9iL/view?usp=sharing"
 tokenizer2 = T5Tokenizer.from_pretrained("t5-base")
-model = T5ForConditionalGeneration.from_pretrained("t5-base",
-                                             return_dict=True)
-model_path = "./Models/T5_gen"
-device = torch.device('cpu')
+model = T5ForConditionalGeneration.from_pretrained("t5-base", return_dict=True)
+model.load_state_dict(torch.load(model_path_t5, map_location=dev))
+model.to(dev)
 
-# Load the model and map it to the CPU using the specified device
-Model1 = torch.load(model_path, map_location=device)
+# Load your GPT-2 model and any other required components
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+model_path_gpt2 = "https://drive.google.com/file/d/1-fdo3tedGIaQRby8RDGQ9HfNJdUgreBT/view?usp=sharing"
+model2 = GPT2LMHeadModel.from_pretrained("gpt2")
+model2.load_state_dict(torch.load(model_path_gpt2, map_location=dev))
+model2.to(dev)
 
-tokenizer = AutoTokenizer.from_pretrained("gpt2")
-generator = pipeline('text-generation',model='./Models/GPT-2_gen', tokenizer='gpt2')
 
 
 def generate_commentary(text):
@@ -35,21 +37,19 @@ def generate_commentary(text):
     input_ids = tokenizer2.encode("WebNLG:{} </s>".format(text), return_tensors="pt")  # Batch size 1
     input_ids = input_ids.to(dev)
     s = time.time()
-    outputs = Model1.generate(input_ids)
+    outputs = model.generate(input_ids)
     gen_text=tokenizer2.decode(outputs[0]).replace('<pad>','').replace('</s>','')
     elapsed = time.time() - s
     print('Generated in {} seconds'.format(str(elapsed)[:4]))
     return gen_text
+def generator(input_text):
+    input_ids = tokenizer.encode(input_text, return_tensors="pt")
+    output = model.generate(input_ids, max_length=100)
+    return tokenizer.decode(output[0], skip_special_tokens=True)
 def listToString(ab):
-    p=[]
-    for key, val in ab[0].items():
-        p.append("{}".format(val))
-    str1 = ""
-    for ele in p:
-        str1 += ele
     res = ""
     cnt = 0
-    for ch in str1:
+    for ch in ab:
         res += ch
         if ch == '.':
             cnt += 1
