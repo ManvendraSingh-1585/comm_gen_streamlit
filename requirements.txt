@@ -3,3 +3,4 @@ transformers==4.30.2
 tokenizers==0.13.3
 torch==1.13.0
 gTTS==2.3.2
+sentencepiece==0.1.99
