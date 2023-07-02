@@ -1,10 +1,7 @@
 import streamlit as st
 import torch
-from transformers import T5Tokenizer, T5ForConditionalGeneration, Adafactor, AutoTokenizer,GPT2Tokenizer, GPT2LMHeadModel
-from sklearn.utils import shuffle
-import time
+from transformers import T5Tokenizer, T5ForConditionalGeneration, GPT2Tokenizer, GPT2LMHeadModel
 from gtts import gTTS
-from IPython.display import Audio
 
 # Load your ML model and any other required components
 if torch.cuda.is_available():
